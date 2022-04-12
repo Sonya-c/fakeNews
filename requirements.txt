@@ -1,1 +1,6 @@
+pandas
+seaborn
 beautifulsoup4
+matplotlib
+urllib3
+nltk
