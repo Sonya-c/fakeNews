@@ -1,10 +1,10 @@
 
 import csv
-from pynvim import encoding
 import requests
 from requests import Response
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from typing import List, Dict
+import urllib.parse
 
 
 def get_page(url: str) -> BeautifulSoup:
@@ -16,16 +16,17 @@ def get_page(url: str) -> BeautifulSoup:
     Returns:
         BeautifulSoup: the beautifulSoup object (None if error)
     """
+
     headers: Dict[str, str] = {
         "User-Agent": "Sonya Castro, sonya-c.github.io",
         "From": "sonyac@uninorte.edu.co"
     }
 
     try:
-        page: Response = requests.get(url, headers)
+        page: Response = requests.get(url, headers)  # request the page
 
         if page.ok:
-            soup = BeautifulSoup(page.content, 'html.parser')
+            soup = BeautifulSoup(page.content, "html.parser")  # parse the page
             return soup
 
     except Exception:
@@ -34,7 +35,7 @@ def get_page(url: str) -> BeautifulSoup:
     return None
 
 
-def save_page(id: int, soup: BeautifulSoup) -> None:
+def save_page(url: str, soup: BeautifulSoup) -> None:
     """Save the page data and the page content
 
     Args:
@@ -42,28 +43,26 @@ def save_page(id: int, soup: BeautifulSoup) -> None:
     """
 
     # Write the date to the cvs file
-    csv_file = csv.writer(open("./data/main.csv", "a"))
+    csv_file = csv.writer(open("./data/data.csv", "a"))
 
-    title: str = "TITLE_ERROR"
+    try:
+        title: str = soup.select("head title")[0].string
+    except Exception:
+        title: str = "TITLE_ERROR"
 
-    for title_tag in soup.find_all("title"):
-        if title_tag.string is not None:
-            title = title_tag.string
+    try:
+        time: str = soup.select("time")[0].attrs["datetime"]
+    except Exception:
+        time: str = "ERROR"
 
     csv_file.writerow([
-        title.replace(",", "")
+        title.replace(",", "").replace("BBC News", "").replace("-", ""),
+        time,
+        url,
     ])
 
-    # Write the page content to a file
-    file_name: str = "data/pages/page_" + str(id) + ".txt"
 
-    with open(file_name, "w", encoding="utf-8") as text_file:
-        text_file.write(
-            soup.find_all("body")[0].get_text()
-        )
-
-
-def get_url_list(soup: BeautifulSoup, url_list: List[str]) -> List[str]:
+def get_url_list(soup: BeautifulSoup, url_list: List[str], parent_url: str) -> List[str]:
     """Get the links of a page
 
     Args:
@@ -73,37 +72,51 @@ def get_url_list(soup: BeautifulSoup, url_list: List[str]) -> List[str]:
     Returns:
         List[str]:
     """
-    for a in soup.select("a"):  # For each anchor in the page
+    for a in soup.select("#site-container a, #main-content a"):  # For each anchor in the page
 
         if a.has_attr("href"):
             href: str = a.attrs["href"]  # Get the link of the anchor
 
             if (len(href) >= 1 and href[0] != "#"):  # If the url is correct
+
+                # It's a relative URL
+                if not urllib.parse.urlparse(href).netloc:
+                    href = urllib.parse.urljoin(parent_url, href)
+
                 url_list.append(href)  # Ad the url to the list of url
 
     return url_list
 
 
-def scrape(num: int, url: str) -> None:
+def scrape(num: int) -> None:
     """Scrape a website 
 
     Args:
         num (int): Number of pages
-        url (str): main url
     """
-    csv_file = csv.writer(open("./data/main.csv", "w"))
-    csv_file.writerow(["Titulo, "])
+    
+    # Write the headers of the csv file
+    csv_file = csv.writer(open("./data/data.csv", "w"))
+    csv_file.writerow(["title", "time", "url"])
 
-    url_list: List[str] = [url]  # Init the url list
-    i: int = 0  # Interator
+    url_list: List[str] = ["https://www.bbc.com/news"]  # Init the url list
+
+    i: int = 0  # Number of page to scrape
     j: int = 0  # Number of correct pages
 
-    while (i <= num and i < len(url_list)):
-        soup = get_page(url_list[i])  # Get the soup object
+    # while when neew more pages and there still page to scrape
+    while (j < num and i < len(url_list)):
+        soup: BeautifulSoup = get_page(url_list[i])  # Get the soup object
 
         if (soup != None):
             j += 1  # New correct page
-            save_page(j, soup)  # Save the page content to a txt
-            url_list = get_url_list(soup, url_list)  # Add new elements to the liss
 
-        i += 1
+            save_page(url_list[i], soup)  # Save the page content to a txt
+
+            # Update the list (get more pages)
+            url_list = get_url_list(soup, url_list, url_list[i])
+
+        i += 1  # Scrape the next page
+
+    print(f"Total scrape pages = {i}")
+    print(f"Total correct pages = {j}")
