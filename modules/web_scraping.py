@@ -35,7 +35,7 @@ def get_page(url: str) -> BeautifulSoup:
     return None
 
 
-def save_page(url: str, soup: BeautifulSoup) -> None:
+def save_page(soup: BeautifulSoup) -> None:
     """Save the page data and the page content
 
     Args:
@@ -52,13 +52,13 @@ def save_page(url: str, soup: BeautifulSoup) -> None:
 
     try:
         time: str = soup.select("time")[0].attrs["datetime"]
+        time = time[:10]
     except Exception:
-        time: str = "ERROR"
+        time: str = "TIME ERROR"
 
     csv_file.writerow([
         title.replace(",", "").replace("BBC News", "").replace("-", ""),
         time,
-        url,
     ])
 
 
@@ -94,10 +94,10 @@ def scrape(num: int) -> None:
     Args:
         num (int): Number of pages
     """
-    
+
     # Write the headers of the csv file
     csv_file = csv.writer(open("./data/data.csv", "w"))
-    csv_file.writerow(["title", "time", "url"])
+    csv_file.writerow(["title", "date"])
 
     url_list: List[str] = ["https://www.bbc.com/news"]  # Init the url list
 
@@ -111,7 +111,7 @@ def scrape(num: int) -> None:
         if (soup != None):
             j += 1  # New correct page
 
-            save_page(url_list[i], soup)  # Save the page content to a txt
+            save_page(soup)  # Save the page content to a txt
 
             # Update the list (get more pages)
             url_list = get_url_list(soup, url_list, url_list[i])
