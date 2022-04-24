@@ -1,8 +1,8 @@
 from typing import Dict, Tuple, List
+import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, sent_tokenize
 import csv
-import nltk
 
 
 def init():
@@ -12,19 +12,14 @@ def init():
     nltk.download('averaged_perceptron_tagger')
 
 
-def get_stop_words() -> List[str]:
-    # get the stopwords
-    
+def get_stop_words():
     stop_words = set(stopwords.words('english'))
     return stop_words
 
 
 def clean_row(sentence: str, stop_words):
-   #  tokenized = sent_tokenize(sentence)
-    tokenizer = nltk.RegexpTokenizer(r"\w+")
-
     words_list = word_tokenize(sentence)
-    words_list = [w for w in words_list if w.isalnum() and not w in stop_words]
+    words_list = [w for w in words_list if w.isalnum() and w not in stop_words]
 
     return words_list
 
@@ -109,8 +104,9 @@ def analysis():
                 word_date[date] = get_max(date, wc, word_date)  # Contar la palabra mas usada en esa fecha
             
     # print(word_count, word_date, article_date, sep="\n")
+    word_count = dict(sorted(word_count.items(), key=lambda item: item[1]))
 
-    save_table("word_type.csv", ["word type", "count"], list(word_type.items()))
+    save_table("word_type.csv", ["word_type", "count"], list(word_type.items()))
     save_table("word_frecuency.csv", ["word", "frecuency"], list(word_count.items()))
-    save_table("word_date.csv", ["date", "words", "frecuency"], list(word_date.items()))
-    save_table("article_date.csv", ["date", "words"], list(article_date.items()))
+    save_table("word_date.csv", ["date", "word_frecuency"], list(word_date.items()))
+    save_table("article_date.csv", ["date", "articles"], list(article_date.items()))
