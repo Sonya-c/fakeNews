@@ -103,7 +103,7 @@ def sort_dict(d: Dict[any, any]):
     return dict(sorted(d.items(), key=lambda x: x[1], reverse=True))
 
 
-def analysis(file_folder: str = "exp_1"):
+def analysis(file_folder: str = "exp_1", date: bool = False):
     init()
 
     word_count: Dict[str, int] = {}  # word, word conuter, date
@@ -134,6 +134,8 @@ def analysis(file_folder: str = "exp_1"):
             wc: Dict[str, int] = get_word_count(word_list)
             word_count = merge_dict(word_count, wc)
 
+            if not date: continue  # If there's no date register, continue
+
             date: str = row[1]  # get the year-month-day
 
             if (date != "TIME ERROR"):  # Si la fecha es correcta, añadir un articulo a esta fecha
@@ -150,11 +152,14 @@ def analysis(file_folder: str = "exp_1"):
                "count"], list(word_type.items()))
     save_table(f"./data/{file_folder}/word_frecuency.csv", [
                "word", "frecuency"], list(word_count.items()))
-    save_table(f"./data/{file_folder}/word_date.csv", [
-               "date", "word", "frecuency"], dict_to_list(word_date))
-    save_table(f"./data/{file_folder}/article_date.csv", [
-               "date", "articles"], list(article_date.items()))
     save_table(f"./data/{file_folder}/bigrams.csv", [
                "bigram", "frecuency"], list(bigram.items()))
     save_table(f"./data/{file_folder}/trigrams.csv", [
                "trigram", "frecuency"], list(trigram.items()))
+
+    if not date: return
+
+    save_table(f"./data/{file_folder}/word_date.csv", [
+               "date", "word", "frecuency"], dict_to_list(word_date))
+    save_table(f"./data/{file_folder}/article_date.csv", [
+               "date", "articles"], list(article_date.items()))

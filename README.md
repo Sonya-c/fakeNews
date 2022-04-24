@@ -11,5 +11,5 @@ pip install -r requirements.txt
 2. Run the main file
 
 ```
-python main
+python main.py
 ```

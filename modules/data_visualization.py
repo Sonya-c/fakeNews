@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 
-def word_graph(data: List[any]):
+def word_graph(fig_num: int = 1, fig_title: str = "", data: List[any] = []):
     """Analisis de palabras
     """
 
-    fig = plt.figure(1)
+    fig = plt.figure(fig_num)
     fig.canvas.set_window_title(
-        "Figura 1: Análisis de palabras (de los articulos obtenidos)")
+        f"Figura {fig_num}: {fig_title}")
     grid_spec = GridSpec(4, 3)
     grid_spec.update(wspace=0.4, hspace=0.8)
 
@@ -33,7 +33,7 @@ def word_graph(data: List[any]):
     ax4.tick_params(rotation=45)
     sns.barplot(data=data[3], x="trigram", y="frecuency", ax=ax4)
 
-    fig.suptitle("Datos de las palabras (de los articulos)", fontsize=16)
+    fig.suptitle(fig_title, fontsize=16)
 
 
 def articles_graph(data):
@@ -69,32 +69,59 @@ def print_table(data, title: str):
 
 
 def visualizate():
-    raw_data = pd.read_csv("./data/exp_1/data.csv", encoding="unicode_escape")
-    word_frecuency = pd.read_csv(
+    exp1_raw_data = pd.read_csv(
+        "./data/exp_1/data.csv", encoding="unicode_escape")
+    exp1_word_frecuency = pd.read_csv(
         "./data/exp_1/word_frecuency.csv", encoding='unicode_escape')
-    word_type_frecuency = pd.read_csv(
+    exp1_word_type_frecuency = pd.read_csv(
         "./data/exp_1/word_type.csv", encoding='unicode_escape')
     mode_per_date = pd.read_csv(
         "./data/exp_1/word_date.csv", encoding='unicode_escape')
     articles_per_date = pd.read_csv(
         "./data/exp_1/article_date.csv", encoding='unicode_escape')
-    bigrams = pd.read_csv(
+    exp1_bigrams = pd.read_csv(
         "./data/exp_1/bigrams.csv", encoding='unicode_escape')
-    trigrams = pd.read_csv(
+    exp1_trigrams = pd.read_csv(
         "./data/exp_1/trigrams.csv", encoding='unicode_escape')
 
-    print_table(raw_data, "Raw data")
+    exp2_raw_data = pd.read_csv(
+        "./data/exp_2/data.csv", encoding="unicode_escape")
+    exp2_word_frecuency = pd.read_csv(
+        "./data/exp_2/word_frecuency.csv", encoding='unicode_escape')
+    exp2_word_type_frecuency = pd.read_csv(
+        "./data/exp_2/word_type.csv", encoding='unicode_escape')
+    exp2_bigrams = pd.read_csv(
+        "./data/exp_2/bigrams.csv", encoding='unicode_escape')
+    exp2_trigrams = pd.read_csv(
+        "./data/exp_2/trigrams.csv", encoding='unicode_escape')
 
-    word_graph([
-        word_frecuency[:10],  # is this sorted?
-        word_type_frecuency,
-        bigrams[:5],
-        trigrams[:5]
-    ])
+    print_table(exp1_raw_data, "Raw data")
+    print_table(exp2_raw_data, "Raw data")
+
+    word_graph(
+        fig_title="Análisis de palabras (de los articulos obtenidos)",
+        data=[
+            exp1_word_frecuency[:10],  # is this sorted?
+            exp1_word_type_frecuency,
+            exp1_bigrams[:5],
+            exp1_trigrams[:5]
+        ]
+    )
 
     articles_graph([
         mode_per_date,
         articles_per_date
     ])
+
+    word_graph(
+        fig_num=3,
+        fig_title="Análisis de palabras (de los titulares generados)",
+        data=[
+            exp2_word_frecuency[:10],  # is this sorted?
+            exp2_word_type_frecuency,
+            exp2_bigrams[:5],
+            exp2_trigrams[:5]
+        ]
+    )
 
     plt.show()
