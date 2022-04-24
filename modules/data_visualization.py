@@ -3,6 +3,16 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+import textwrap
+
+
+def wrap_labels(ax, width, break_long_words=False):
+    labels = []
+    for label in ax.get_xticklabels():
+        text = label.get_text()
+        labels.append(textwrap.fill(text, width=width,
+                      break_long_words=break_long_words))
+    ax.set_xticklabels(labels, rotation=0)
 
 
 def word_graph(data: List[any]):
@@ -21,13 +31,19 @@ def word_graph(data: List[any]):
 
     ax2 = fig.add_subplot(grid_spec[2:, :2])  # tipos de palabra
     ax2.set_title("Tipos de palabras")
-    sns.barplot(data=data[1], x="type", y="count", ax=ax2)
+    sns.barplot(data=data[1], x="word_type", y="count", ax=ax2)
 
     ax3 = fig.add_subplot(grid_spec[:2, 2:])  # bigramas
-    ax3.set_title("Bigramas")
+    ax3.set_title("10 Bigramas más comunes")
+    wrap_labels(ax3, 5)
+    ax3.figure
+    sns.barplot(data=data[2], x="bigram", y="frecuency", ax=ax3)
 
     ax4 = fig.add_subplot(grid_spec[2:, 2:])  # trigramas
-    ax4.set_title("Trigramas")
+    ax4.set_title("10 Trigramas más comunes")
+    wrap_labels(ax4, 5)
+    ax4.figure
+    sns.barplot(data=data[3], x="trigram", y="frecuency", ax=ax4)
 
     fig.suptitle("Datos de las palabras (de los articulos)", fontsize=16)
 
@@ -74,12 +90,18 @@ def visualizate():
         "./data/word_date.csv", encoding='unicode_escape')
     articles_per_date = pd.read_csv(
         "./data/article_date.csv", encoding='unicode_escape')
+    bigrams = pd.read_csv(
+        "./data/bigrams.csv", encoding='unicode_escape')
+    trigrams = pd.read_csv(
+        "./data/trigrams.csv", encoding='unicode_escape')
 
     print_table(raw_data, "Raw data")
 
     word_graph([
         word_frecuency[:10],  # is this sorted?
         word_type_frecuency,
+        bigrams[:5],
+        trigrams[:5]
     ])
 
     articles_graph([
