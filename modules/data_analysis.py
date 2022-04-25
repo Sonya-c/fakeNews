@@ -64,11 +64,11 @@ def merge_dict(d1: Dict[str, int], d2: Dict[str, int]) -> Dict[str, int]:
 
 
 def get_max(date: str, word_count: Dict[str, int], word_date: Tuple[str, int]) -> Tuple[str, int]:
-    max_word = max(word_count, key=word_count.get)
-    max_value = max(word_count.values())
+    max_word = max(word_count, key=word_count.get, default="")
+    max_value = max(word_count.values(), default=0)
 
     wd = word_date.get(date, ["", 0])  # Get the word count
-
+    
     if (max_word == wd[0]):
         max_value += wd[1]
         wd = [max_word, max_value]

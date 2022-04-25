@@ -1,6 +1,7 @@
 pandas
 seaborn
 beautifulsoup4
+requets
 matplotlib
 urllib3
 nltk

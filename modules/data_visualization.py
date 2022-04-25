@@ -95,8 +95,8 @@ def visualizate():
     exp2_trigrams = pd.read_csv(
         "./data/exp_2/trigrams.csv", encoding='unicode_escape')
 
-    print_table(exp1_raw_data, "Raw data")
-    print_table(exp2_raw_data, "Raw data")
+    print_table(exp1_raw_data, "Datos sin procedar")
+    print_table(exp2_raw_data, "Titulares generados")
 
     word_graph(
         fig_title="Análisis de palabras (de los articulos obtenidos)",

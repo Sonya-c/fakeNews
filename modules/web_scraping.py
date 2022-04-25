@@ -93,10 +93,6 @@ def scrape(num: int) -> None:
         num (int): Number of pages
     """
 
-    # Write the headers of the csv file
-    csv_file = csv.writer(open("./data/exp_1/data.csv", "w"))
-    csv_file.writerow(["title", "date"])
-
     url_list: List[str] = ["https://www.bbc.com/news"]  # Init the url list
 
     i: int = 0  # Number of page to scrape
