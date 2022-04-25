@@ -103,8 +103,8 @@ def visualizate():
         data=[
             exp1_word_frecuency[:10],  # is this sorted?
             exp1_word_type_frecuency,
-            exp1_bigrams[:5],
-            exp1_trigrams[:5]
+            exp1_bigrams[:10],
+            exp1_trigrams[:10]
         ]
     )
 
